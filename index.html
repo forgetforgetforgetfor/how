@@ -1,121 +1,122 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title> </title>
-
+<title></title>
 <style>
-* {
+* { box-sizing: border-box; }
+html, body {
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
+    min-height: 100%;
     background: #000;
-    color: white;
+    color: #fff;
     font-family: Arial, sans-serif;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+}
+body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
     overflow: hidden;
 }
-
-.container {
+.login {
+    width: min(90vw, 360px);
     text-align: center;
 }
-
-h2 {
-    font-size: 20px;
-    font-weight: normal;
+h1 {
+    margin: 0 0 26px;
+    font-size: 18px;
+    font-weight: 400;
     letter-spacing: 5px;
-    margin-bottom: 25px;
 }
-
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
 input {
-    background: transparent;
-    border: 1px solid #333;
-    color: white;
-    padding: 13px;
+    width: 100%;
+    padding: 14px 12px;
+    border: 1px solid #444;
+    border-radius: 0;
     outline: none;
+    background: #050505;
+    color: #fff;
     text-align: center;
-    letter-spacing: 4px;
-    width: 230px;
-}
-
-input:focus {
-    border-color: white;
-}
-
-button {
-    display: block;
-    margin: 15px auto;
-    padding: 10px 30px;
-    background: transparent;
-    color: white;
-    border: 1px solid #333;
-    cursor: pointer;
+    font: inherit;
     letter-spacing: 3px;
 }
-
-button:hover {
-    background: white;
-    color: black;
+input:focus { border-color: #aaa; }
+button {
+    min-width: 130px;
+    padding: 11px 24px;
+    border: 1px solid #444;
+    border-radius: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    letter-spacing: 3px;
+    cursor: pointer;
 }
-
+button:hover {
+    background: #fff;
+    color: #000;
+}
 #forget {
     display: none;
     position: fixed;
     inset: 0;
-    background: black;
-    color: white;
+    z-index: 10;
     overflow: hidden;
-    z-index: 999;
+    background: #000;
 }
-
-.forget-text {
+#forgetWords {
     position: absolute;
-    inset: -20px;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: space-around;
-    justify-content: space-around;
-    gap: 15px;
-    font-size: clamp(20px, 4vw, 55px);
-    font-weight: bold;
-    letter-spacing: 4px;
+    inset: -2%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+    grid-auto-rows: minmax(55px, 1fr);
+    align-items: center;
+    justify-items: center;
+    gap: 4px;
+    color: #fff;
+    font-size: clamp(18px, 3.3vw, 46px);
+    font-weight: 800;
+    letter-spacing: 3px;
     overflow: hidden;
 }
 </style>
 </head>
-
 <body>
 
-<div class="container" id="login">
-    <h2>ENTER PASSWORD</h2>
+<main class="login" id="login">
+    <h1>ENTER PASSWORD</h1>
+    <form id="entryForm">
+        <input
+            id="entry"
+            type="text"
+            placeholder="TYPE HERE"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-label="Enter password or trigger word"
+        >
+        <button type="submit">ENTER</button>
+    </form>
+</main>
 
-    <input
-        type="password"
-        id="password"
-        placeholder="PASSWORD"
-        autocomplete="off"
-    >
+<section id="forget" aria-live="polite">
+    <div id="forgetWords"></div>
+</section>
 
-    <button onclick="checkPassword()">ENTER</button>
-</div>
-
-<div id="forget">
-    <div class="forget-text" id="forgetText"></div>
-</div>
+<audio id="bgMusic" src="background.mp3" loop preload="auto"></audio>
 
 <script>
 const destination =
-"https://drive.google.com/file/d/1K7qN4dm2WYmShw3F7b1vODODuIH8_aw6/view?usp=sharing";
+    "https://drive.google.com/file/d/1K7qN4dm2WYmShw3F7b1vODODuIH8_aw6/view?usp=sharing";
 
-const triggers = [
+const triggerWords = [
     "mystery",
     "anormal",
     "frenzy",
@@ -124,61 +125,65 @@ const triggers = [
     "kuraf"
 ];
 
-function checkPassword() {
-    const password = document
-        .getElementById("password")
-        .value.trim()
-        .toLowerCase();
+const form = document.getElementById("entryForm");
+const entry = document.getElementById("entry");
+const music = document.getElementById("bgMusic");
+let forgetActivated = false;
 
-    if (password === "frar") {
-        window.location.href = destination;
-    } else {
-        window.close();
-
-        // Fallback if the browser blocks closing the tab
-        setTimeout(() => {
-            window.location.replace("about:blank");
-        }, 100);
+function startMusic() {
+    if (music.paused) {
+        music.play().catch(() => {
+            // Most browsers require a user interaction before allowing audio.
+        });
     }
 }
 
-// Allow Enter key
-document.getElementById("password")
-    .addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-            checkPassword();
-        }
-    });
-
-// Detect trigger words typed anywhere
-let typed = "";
-
-document.addEventListener("keydown", function(e) {
-    if (e.key.length !== 1) return;
-
-    typed += e.key.toLowerCase();
-    typed = typed.slice(-50);
-
-    if (triggers.some(word => typed.includes(word))) {
-        activateForget();
-    }
-});
+// Try autoplay; if the browser blocks it, the first click or keypress starts it.
+window.addEventListener("load", startMusic);
+document.addEventListener("pointerdown", startMusic, { once: true });
+document.addEventListener("keydown", startMusic, { once: true });
 
 function activateForget() {
-    document.getElementById("login").style.display = "none";
+    if (forgetActivated) return;
+    forgetActivated = true;
 
+    document.getElementById("login").style.display = "none";
     const screen = document.getElementById("forget");
+    const words = document.getElementById("forgetWords");
+
     screen.style.display = "block";
 
-    const text = document.getElementById("forgetText");
-
-    for (let i = 0; i < 150; i++) {
-        const word = document.createElement("span");
-        word.textContent = "FORGET";
-        text.appendChild(word);
+    for (let i = 0; i < 180; i++) {
+        const span = document.createElement("span");
+        span.textContent = "FORGET";
+        words.appendChild(span);
     }
-}
-</script>
 
+    startMusic();
+}
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const typed = entry.value.trim().toLowerCase();
+
+    // Trigger words take priority over the password.
+    if (triggerWords.some(word => typed.includes(word))) {
+        activateForget();
+        return;
+    }
+
+    if (typed === "frar") {
+        window.location.href = destination;
+        return;
+    }
+
+    // Browsers may block window.close() for tabs not opened by script.
+    window.close();
+    setTimeout(() => {
+        window.location.replace("about:blank");
+    }, 150);
+});
+</script>
 </body>
 </html>
