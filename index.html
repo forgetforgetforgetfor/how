@@ -85,8 +85,8 @@ form.addEventListener("submit", function(event) {
         return;
     }
 
-    if (Object.prototype.hasOwnProperty.call(destinations, typed)) {
-        window.location.href = destinations[typed];
+    if (Object.prototype.hasOwnProperty.call(destinations, typed.toLowerCase())) {
+        window.location.href = destinations[typed.toLowerCase()];
         return;
     }
 
