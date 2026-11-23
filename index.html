@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> </title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    color: white;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.container {
+    text-align: center;
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: normal;
+    letter-spacing: 5px;
+    margin-bottom: 25px;
+}
+
+input {
+    background: transparent;
+    border: 1px solid #333;
+    color: white;
+    padding: 13px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 4px;
+    width: 230px;
+}
+
+input:focus {
+    border-color: white;
+}
+
+button {
+    display: block;
+    margin: 15px auto;
+    padding: 10px 30px;
+    background: transparent;
+    color: white;
+    border: 1px solid #333;
+    cursor: pointer;
+    letter-spacing: 3px;
+}
+
+button:hover {
+    background: white;
+    color: black;
+}
+
+#forget {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: black;
+    color: white;
+    overflow: hidden;
+    z-index: 999;
+}
+
+.forget-text {
+    position: absolute;
+    inset: -20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-around;
+    justify-content: space-around;
+    gap: 15px;
+    font-size: clamp(20px, 4vw, 55px);
+    font-weight: bold;
+    letter-spacing: 4px;
+    overflow: hidden;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="login">
+    <h2>ENTER PASSWORD</h2>
+
+    <input
+        type="password"
+        id="password"
+        placeholder="PASSWORD"
+        autocomplete="off"
+    >
+
+    <button onclick="checkPassword()">ENTER</button>
+</div>
+
+<div id="forget">
+    <div class="forget-text" id="forgetText"></div>
+</div>
+
+<script>
+const destination =
+"https://drive.google.com/file/d/1K7qN4dm2WYmShw3F7b1vODODuIH8_aw6/view?usp=sharing";
+
+const triggers = [
+    "mystery",
+    "anormal",
+    "frenzy",
+    "frk",
+    "hxtxn",
+    "kuraf"
+];
+
+function checkPassword() {
+    const password = document
+        .getElementById("password")
+        .value.trim()
+        .toLowerCase();
+
+    if (password === "frar") {
+        window.location.href = destination;
+    } else {
+        window.close();
+
+        // Fallback if the browser blocks closing the tab
+        setTimeout(() => {
+            window.location.replace("about:blank");
+        }, 100);
+    }
+}
+
+// Allow Enter key
+document.getElementById("password")
+    .addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            checkPassword();
+        }
+    });
+
+// Detect trigger words typed anywhere
+let typed = "";
+
+document.addEventListener("keydown", function(e) {
+    if (e.key.length !== 1) return;
+
+    typed += e.key.toLowerCase();
+    typed = typed.slice(-50);
+
+    if (triggers.some(word => typed.includes(word))) {
+        activateForget();
+    }
+});
+
+function activateForget() {
+    document.getElementById("login").style.display = "none";
+
+    const screen = document.getElementById("forget");
+    screen.style.display = "block";
+
+    const text = document.getElementById("forgetText");
+
+    for (let i = 0; i < 150; i++) {
+        const word = document.createElement("span");
+        word.textContent = "FORGET";
+        text.appendChild(word);
+    }
+}
+</script>
+
+</body>
+</html>
